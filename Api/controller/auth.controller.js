@@ -36,7 +36,7 @@ export const signin = async (req, res,next) => {
 };
 
 export const google = async (req, res, next) => {
-    const { name, email, photourl } = req.body;
+    const { name, email, photoURL } = req.body;
   
     try {
       const user = await User.findOne({ email });
@@ -57,7 +57,7 @@ export const google = async (req, res, next) => {
           username: name.split(' ').join('').toLowerCase() + Math.random().toString(10).slice(-4),
           email,
           password: hashedPassword,
-          avatar: photourl,
+          avatar: photoURL,
         });
   
         try {

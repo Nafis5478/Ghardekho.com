@@ -14,13 +14,14 @@ export default function Oauth() {
     
             const result = await signInWithPopup(auth,provider);
             // now get the results from the api fetch through google authentication.
-            
+            // console.log('result');
+            // console.log(result.user.photoURL);
             const res = await fetch('/api/auth/google', {
                 method: 'POST',
                 headers: {
                   'content-type': 'application/json',
                 },
-                body: JSON.stringify({ name: result.user.displayName, email: result.user.email, photourl: result.user.photoURL }),
+                body: JSON.stringify({ name: result.user.displayName, email: result.user.email, photoURL: result.user.photoURL }),
               });
               
     
