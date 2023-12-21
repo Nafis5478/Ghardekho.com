@@ -34,3 +34,46 @@ export const signin = async (req, res,next) => {
         next(error)
     }
 };
+
+export const google = async (req, res, next) => {
+    const { name, email, photourl } = req.body;
+  
+    try {
+      const user = await User.findOne({ email });
+  
+      if (user) {
+        // User is already registered, proceed to sign in
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        const { password, ...rest } = user._doc;
+  
+        res.cookie('access_token', token, { httpOnly: true }).status(200).json(rest);
+      } else {
+        // User is not registered, create a new user
+        const generatePassword = Math.random().toString(36).slice(-8);
+        const saltRounds = 10; // Number of salt rounds for bcrypt
+        const hashedPassword = await bcryptjs.hash(generatePassword, saltRounds);
+  
+        const newUser = new User({
+          username: name.split(' ').join('').toLowerCase() + Math.random().toString(10).slice(-4),
+          email,
+          password: hashedPassword,
+          avatar: photourl,
+        });
+  
+        try {
+          await newUser.save();
+  
+          // Sign in the newly created user
+          const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+          const { password, ...rest } = newUser._doc;
+  
+          res.cookie('access_token', token, { httpOnly: true }).status(200).json(rest);
+        } catch (error) {
+          // Handle the error, for example, send an error response
+          next(error);
+        }
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
