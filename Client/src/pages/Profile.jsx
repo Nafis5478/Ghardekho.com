@@ -2,7 +2,7 @@ import { current } from "@reduxjs/toolkit";
 import React, { useEffect, useState } from "react";
 import { useRef } from "react";
 import { useDispatch,useSelector } from "react-redux";
-import { updateUserStart,updateUserSuccess,updateUserFailure } from "../redux/user/userSlice";
+import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserFailure, deleteUserstart, deleteUserSuccess, signoutFailure, signoutSuccess } from "../redux/user/userSlice";
 import {
   getStorage,
   uploadBytes,
@@ -77,6 +77,35 @@ export default function Profile() {
       dispatch(updateUserFailure(error.message));
     }
   }
+  const handleDelete = async(e) =>{
+    try {
+      dispatch(deleteUserstart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`,{
+        method:'DELETE',
+      });
+      const data = await res.json();
+        if(data.success===false){
+          dispatch(deleteUserFailure(data.message));
+          return;
+        }
+        dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  }
+  const handleSignout= async()=>{
+    try {
+      const res=await fetch('/api/auth/signout');
+      const data=await res.json();
+      if(data.success===false){
+        dispatch(signoutFailure(data.message));
+        return;
+      }
+      dispatch(signoutSuccess(data));
+    } catch (error) {
+      dispatch(signoutFailure(error));
+    }
+  }
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-center my-5 text-3xl font-semibold">Profile</h1>
@@ -122,7 +151,7 @@ export default function Profile() {
           onChange={handleChange}
         />
         <input
-          type="text"
+          type="password"
           placeholder="Password"
           className="border p-3 rounded-lg"
           id="password"
@@ -139,8 +168,8 @@ export default function Profile() {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete account</span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span onClick={handleDelete} className="text-red-700 cursor-pointer">Delete account</span>
+        <span onClick={handleSignout} className="text-red-700 cursor-pointer">Sign out</span>
       </div>
       {error && <p className='text-red-500 mt-5'>{error}</p>}
       <p className="text-green-700 mt-5">{updateSuccess?'Profile updated successfully!!':''}</p>
