@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoute from './route/user.router.js';
 import authRoute from './route/auth.router.js';
+import listingRouter from './route/listing.router.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -41,6 +42,7 @@ app.use(cookieParser());
 
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/listing', listingRouter);
 app.use((err,req,res,next)=>{
     const statusCode=err.statusCode||500;
     const message=err.message||'Internal server error';
