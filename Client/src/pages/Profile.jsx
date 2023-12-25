@@ -2,7 +2,11 @@ import { current } from "@reduxjs/toolkit";
 import React, { useEffect, useState } from "react";
 import { useRef } from "react";
 import { useDispatch,useSelector } from "react-redux";
+<<<<<<< HEAD
 import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserFailure, deleteUserstart, deleteUserSuccess, signoutFailure, signoutSuccess } from "../redux/user/userSlice";
+=======
+import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserFailure, deleteUserstart, deleteUserSuccess } from "../redux/user/userSlice";
+>>>>>>> 526501d857ef9c41b06dc285ce50760a608330ba
 import {
   getStorage,
   uploadBytes,
@@ -80,7 +84,11 @@ export default function Profile() {
   const handleDelete = async(e) =>{
     try {
       dispatch(deleteUserstart());
+<<<<<<< HEAD
       const res = await fetch(`/api/user/delete/${currentUser._id}`,{
+=======
+      const res = await fetch(`api/user/delete/${currentUser._id}`,{
+>>>>>>> 526501d857ef9c41b06dc285ce50760a608330ba
         method:'DELETE',
       });
       const data = await res.json();
@@ -93,6 +101,7 @@ export default function Profile() {
       dispatch(deleteUserFailure(error.message));
     }
   }
+<<<<<<< HEAD
   const handleSignout= async()=>{
     try {
       const res=await fetch('/api/auth/signout');
@@ -106,6 +115,8 @@ export default function Profile() {
       dispatch(signoutFailure(error));
     }
   }
+=======
+>>>>>>> 526501d857ef9c41b06dc285ce50760a608330ba
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-center my-5 text-3xl font-semibold">Profile</h1>
@@ -169,7 +180,11 @@ export default function Profile() {
       </form>
       <div className="flex justify-between mt-5">
         <span onClick={handleDelete} className="text-red-700 cursor-pointer">Delete account</span>
+<<<<<<< HEAD
         <span onClick={handleSignout} className="text-red-700 cursor-pointer">Sign out</span>
+=======
+        <span className="text-red-700 cursor-pointer">Sign out</span>
+>>>>>>> 526501d857ef9c41b06dc285ce50760a608330ba
       </div>
       {error && <p className='text-red-500 mt-5'>{error}</p>}
       <p className="text-green-700 mt-5">{updateSuccess?'Profile updated successfully!!':''}</p>
