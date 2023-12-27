@@ -1,4 +1,6 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   getStorage,
   uploadBytes,
@@ -9,12 +11,27 @@ import {
 import { app } from "../firebase";
 import { useState } from "react";
 export default function CreateListng() {
+  const navigate=useNavigate();
+  const { currentUser } = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
   const [filePerc, setFilePerc] = useState(0);
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [submitError, setsubmitError] = useState(false);
+  const [submitLoading, setsubmitLoading] = useState(false);
   const [formData, setFormData] = useState({
     imageUrls: [],
+    name: "",
+    description: "",
+    address: "",
+    type: "rent",
+    bedrooms: 1,
+    bathrooms: 1,
+    regularPrice: 50,
+    discountPrice: 0,
+    offer: false,
+    parking: false,
+    furnished: false,
   });
   const handleUploadImage = (e) => {
     if (files.length == 0) {
@@ -41,7 +58,6 @@ export default function CreateListng() {
         .catch((err) => {
           setImageUploadError("Error in uploading, max 2MB image size");
           setUploading(false);
-
         });
     } else {
       setUploading(false);
@@ -79,12 +95,76 @@ export default function CreateListng() {
       imageUrls: formData.imageUrls.filter((_, i) => i !== index),
     });
   };
+  const handleChange = (e) => {
+    if (e.target.id === "sell" || e.target.id === "rent") {
+      setFormData({
+        ...formData,
+        type: e.target.id,
+      });
+    }
+    if (
+      e.target.id === "parking" ||
+      e.target.id === "furnished" ||
+      e.target.id === "offer"
+    ) {
+      setFormData({
+        ...formData,
+        [e.target.id]: e.target.checked,
+      });
+    }
+    if (
+      e.target.type === "number" ||
+      e.target.type === "text" ||
+      e.target.type === "textarea"
+    ) {
+      setFormData({
+        ...formData,
+        [e.target.id]: e.target.value,
+      });
+    }
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (formData.imageUrls.length < 1) {
+        return setsubmitError("Upload atleast 1 image.");
+      }
+      if (+formData.regularPrice < +formData.discountPrice) {
+        return setsubmitError(
+          "Discounted Price should always be lesser than Regular Price."
+        );
+      }
+      setsubmitError(false);
+      setsubmitLoading(true);
+      const res = await fetch("/api/listing/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          userRef: currentUser._id,
+        }),   
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setsubmitLoading(false);
+        setsubmitError(error.message);
+      }
+      setsubmitError(false);
+      setsubmitLoading(false);
+      navigate(`/listing/${data._id}`);
+    } catch (error) {
+      setsubmitError(error.message);
+      setsubmitLoading(false);
+    }
+  };
   return (
     <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
         Create a Listing
       </h1>
-      <form className="flex flex-col sm:flex-row gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
         <div className="flex flex-col gap-4 flex-1">
           <input
             type="text"
@@ -94,13 +174,17 @@ export default function CreateListng() {
             maxLength="50"
             minLength="10"
             required
+            onChange={handleChange}
+            value={formData.name}
           />
           <textarea
             type="text"
             placeholder="Description"
             className="border p-3 rounded-lg"
-            id="name"
+            id="description"
             required
+            onChange={handleChange}
+            value={formData.description}
           />
           <input
             type="text"
@@ -110,33 +194,71 @@ export default function CreateListng() {
             maxLength="50"
             minLength="10"
             required
+            onChange={handleChange}
+            value={formData.address}
           />
           <div className="flex gap-6 flex-wrap">
             <div className="flex gap-2">
-              <input type="checkbox" id="sell" className="w-5" />
+              <input
+                type="checkbox"
+                id="sell"
+                className="w-5"
+                onChange={handleChange}
+                checked={formData.type === "sell"}
+              />
               <span>Sell</span>
             </div>
             <div className="flex gap-2">
-              <input type="checkbox" id="parking" className="w-5" />
+              <input
+                type="checkbox"
+                id="rent"
+                className="w-5"
+                onChange={handleChange}
+                checked={formData.type === "rent"}
+              />
+              <span>Rent</span>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="checkbox"
+                id="parking"
+                className="w-5"
+                onChange={handleChange}
+                checked={formData.parking}
+              />
               <span>Parking Spot</span>
             </div>
             <div className="flex gap-2">
-              <input type="checkbox" id="furnished" className="w-5" />
+              <input
+                type="checkbox"
+                id="furnished"
+                className="w-5"
+                onChange={handleChange}
+                checked={formData.furnished}
+              />
               <span>Furnished</span>
             </div>
             <div className="flex gap-2">
-              <input type="checkbox" id="other" className="w-5" />
-              <span>Other</span>
+              <input
+                type="checkbox"
+                id="offer"
+                className="w-5"
+                onChange={handleChange}
+                checked={formData.offer}
+              />
+              <span>Offer</span>
             </div>
           </div>
           <div className="flex gap-6 flex-wrap">
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                id="bedroom"
+                id="bedrooms"
                 min="1"
                 max="10"
                 required
+                onChange={handleChange}
+                value={formData.bedrooms}
                 className="p-3 border border-gray-300 rounded-lg"
               />
               <span>Bedroom</span>
@@ -144,10 +266,12 @@ export default function CreateListng() {
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                id="bathroom"
+                id="bathrooms"
                 min="1"
                 max="10"
                 required
+                onChange={handleChange}
+                value={formData.bathrooms}
                 className="p-3 border border-gray-300 rounded-lg"
               />
               <span>Bathroom</span>
@@ -155,31 +279,41 @@ export default function CreateListng() {
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                id="regular"
-                min="1"
-                max="10"
+                id="regularPrice"
+                min="50"
+                max="10000000"
                 required
+                onChange={handleChange}
+                value={formData.regularPrice}
                 className="p-3 border border-gray-300 rounded-lg"
               />
               <div className="flex flex-col text-center">
                 <span>Regular Price</span>
-                <span className="text-xs">($ / months)</span>
+                {formData.type === "rent" && (
+                  <span className="text-xs">($ / months)</span>
+                )}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                id="discount"
-                min="1"
-                max="10"
-                required
-                className="p-3 border border-gray-300 rounded-lg"
-              />
-              <div className="flex flex-col text-center">
-                <span>Discounted Price</span>
-                <span className="text-xs">($ / months)</span>
+            {formData.offer && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  id="discountPrice"
+                  min="50"
+                  max="10000000"
+                  required
+                  onChange={handleChange}
+                  value={formData.discountPrice}
+                  className="p-3 border border-gray-300 rounded-lg"
+                />
+                <div className="flex flex-col text-center">
+                  <span>Discounted Price</span>
+                  {formData.type === "rent" && (
+                    <span className="text-xs">($ / months)</span>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-4 flex-1">
@@ -230,9 +364,15 @@ export default function CreateListng() {
                 </button>
               </div>
             ))}
-          <button className="p-3 bg-slate-700 text-white rounded-lg hover: opacity-95 disabled:80">
-            Create Listing
+          <button
+            disabled={submitLoading || uploading}
+            className="p-3 bg-slate-700 text-white rounded-lg hover:opacity-95 disabled:opacity-80"
+          >
+            {submitLoading ? "Creating..." : "Create Listing"}
           </button>
+          {submitError && (
+            <span className="text-red-700 text-sm">{submitError}</span>
+          )}
         </div>
       </form>
     </main>
