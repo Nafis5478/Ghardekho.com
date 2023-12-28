@@ -1,15 +1,25 @@
 import { current } from "@reduxjs/toolkit";
 import React, { useEffect, useState } from "react";
 import { useRef } from "react";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserFailure, deleteUserstart, deleteUserSuccess, signoutFailure, signoutSuccess } from "../redux/user/userSlice";
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+  deleteUserFailure,
+  deleteUserstart,
+  deleteUserSuccess,
+  signoutFailure,
+  signoutSuccess,
+} from "../redux/user/userSlice";
 import {
   getStorage,
   uploadBytes,
   uploadBytesResumable,
   ref,
   getDownloadURL,
+  list,
 } from "firebase/storage";
 import { app } from "../firebase";
 export default function Profile() {
@@ -20,8 +30,11 @@ export default function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  const {loading,error}=useSelector((state)=>state.user);
-  const dispatch=useDispatch();
+  const { loading, error } = useSelector((state) => state.user);
+  const [listingError, setlistingError] = useState(false);
+  const [loadListing, setLoadListing] = useState(false);
+  const [listings, setlistings] = useState([]);
+  const dispatch = useDispatch();
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
@@ -56,49 +69,49 @@ export default function Profile() {
       [e.target.id]: e.target.value,
     });
   };
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        dispatch(updateUserStart());
-        const res = await fetch(`/api/user/update/${currentUser._id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-        const data = await res.json();
-        if(data.success===false){
-          dispatch(updateUserFailure(data.message));
-          return;
-        }
-        dispatch(updateUserSuccess(data));
-        setUpdateSuccess(true);
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+        return;
+      }
+      dispatch(updateUserSuccess(data));
+      setUpdateSuccess(true);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
-  }
-  const handleDelete = async(e) =>{
+  };
+  const handleDelete = async (e) => {
     try {
       dispatch(deleteUserstart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`,{
-        method:'DELETE',
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
       });
       const data = await res.json();
-        if(data.success===false){
-          dispatch(deleteUserFailure(data.message));
-          return;
-        }
-        dispatch(deleteUserSuccess(data));
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
-  }
-  const handleSignout= async()=>{
+  };
+  const handleSignout = async () => {
     try {
-      const res=await fetch('/api/auth/signout');
-      const data=await res.json();
-      if(data.success===false){
+      const res = await fetch("/api/auth/signout");
+      const data = await res.json();
+      if (data.success === false) {
         dispatch(signoutFailure(data.message));
         return;
       }
@@ -106,7 +119,28 @@ export default function Profile() {
     } catch (error) {
       dispatch(signoutFailure(error));
     }
-  }
+  };
+  const handleShowlistings = async () => {
+    console.log("your listings are here sir!!!");
+    try {
+      setlistingError(false);
+      setLoadListing(true);
+      const res = await fetch(`/api/user/listings/${currentUser._id}`, {
+        method: "GET",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setlistingError(data.message);
+        return;
+      }
+      setlistingError(false);
+      setLoadListing(false);
+      setlistings(data);
+    } catch (error) {
+      setlistingError(error.message);
+      setLoadListing(false);
+    }
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-center my-5 text-3xl font-semibold">Profile</h1>
@@ -120,20 +154,23 @@ export default function Profile() {
         />
         <img
           onClick={() => fileRef.current.click()}
-          src={formData.avatar||currentUser.avatar}
+          src={formData.avatar || currentUser.avatar}
           alt={"profile"}
           className="rounded-full object-cover cursor-pointer self-center mt-2 h-24 w-24"
           onChange={handleChange}
         />
         <p className="text-sm self-center">
-          {
-            fileUploadError?(<span className="text-red-700">Error Image Upload (image size must be less than 2MB)</span>):
-            filePerc>0&&filePerc<100 ? (<span className="text-slate-700">
-              {`Uploading ${filePerc}%`}
-            </span>):
-            filePerc===100?(<span className="text-green-700">Uploaded successfully</span>):
+          {fileUploadError ? (
+            <span className="text-red-700">
+              Error Image Upload (image size must be less than 2MB)
+            </span>
+          ) : filePerc > 0 && filePerc < 100 ? (
+            <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
+          ) : filePerc === 100 ? (
+            <span className="text-green-700">Uploaded successfully</span>
+          ) : (
             ""
-          }
+          )}
         </p>
         <input
           type="text"
@@ -160,20 +197,57 @@ export default function Profile() {
         />
         <button
           disabled={loading}
-          className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
+          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
         >
-          {loading ? 'Loading...' : 'Update'}
+          {loading ? "Loading..." : "Update"}
         </button>
-        <Link to={"/create-listing"} className="bg-green-700 text-white text-center p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
+        <Link
+          to={"/create-listing"}
+          className="bg-green-700 text-white text-center p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+        >
           add new list
         </Link>
       </form>
       <div className="flex justify-between mt-5">
-        <span onClick={handleDelete} className="text-red-700 cursor-pointer">Delete account</span>
-        <span onClick={handleSignout} className="text-red-700 cursor-pointer">Sign out</span>
+        <span onClick={handleDelete} className="text-red-700 cursor-pointer">
+          Delete account
+        </span>
+        <span onClick={handleSignout} className="text-red-700 cursor-pointer">
+          Sign out
+        </span>
       </div>
-      {error && <p className='text-red-500 mt-5'>{error}</p>}
-      <p className="text-green-700 mt-5">{updateSuccess?'Profile updated successfully!!':''}</p>
+      {error && <p className="text-red-500 mt-5">{error}</p>}
+      <p className="text-green-700 mt-5">
+        {updateSuccess ? "Profile updated successfully!!" : ""}
+      </p>
+      <button onClick={handleShowlistings} className="text-green-700 w-full">
+        {loadListing ? "Loading..." : "Show Listings"}
+      </button>
+      {listingError && <p className="text-red-500 mt-5">{listingError}</p>}
+      {/* {listings.length} */}
+      {listings &&
+        listings.length > 0 &&
+        <div className="flex flex-col gap-2">
+          <h1 className="text-center font-semibold mt-7 text-3xl">Your Listings</h1>
+        {listings.map((listing) => (
+          <div key={listing._id} className="border border-gray-400 flex justify-between p-3 gap-4 rounded-lg items-center">
+            <Link to={`/listing/${listing._id}`}>
+              <img
+                src={listing.imageUrls[0]}
+                alt="cover-image"
+                className="h-16 w-16 object-contain "
+              />
+            </Link>
+            <Link className=''to={`/listing/${listing._id}`}>
+              <span className="flex-1 text-slate-700 hover:underline font-semibold truncate">{listing.name}</span>
+            </Link>
+            <div className="flex flex-col">
+              <button className="text-red-700 uppercase">Delete</button>
+              <button className="text-green-700 uppercase">Edit</button>
+            </div>
+          </div>
+        ))}
+        </div>}
     </div>
   );
 }
