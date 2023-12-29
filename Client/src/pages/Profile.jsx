@@ -1,6 +1,7 @@
 import { current } from "@reduxjs/toolkit";
 import React, { useEffect, useState } from "react";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
@@ -23,6 +24,7 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 export default function Profile() {
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
@@ -258,7 +260,9 @@ export default function Profile() {
             </Link>
             <div className="flex flex-col">
               <button onClick={()=>handleDeleteListing(listing._id)} className="text-red-700 uppercase">Delete</button>
-              <button className="text-green-700 uppercase">Edit</button>
+              <Link to={`/update-listing/${listing._id}`}>
+                <button className="text-green-700 uppercase">Edit</button>
+              </Link>
             </div>
           </div>
         ))}
