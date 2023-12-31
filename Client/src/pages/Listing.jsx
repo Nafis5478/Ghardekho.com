@@ -1,8 +1,10 @@
 import React from "react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useSelector } from "react-redux";
 import SwiperCore from "swiper";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
@@ -15,7 +17,9 @@ import {
   FaParking,
   FaShare,
 } from "react-icons/fa";
+import Email from "./Email.jsx";
 export default function Listing() {
+  const { currentUser } = useSelector((state) => state.user);
   SwiperCore.use([Navigation]);
   const params = useParams();
   const ListingId = params.listingId;
@@ -23,6 +27,7 @@ export default function Listing() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [contactButton, setcontactButton] = useState(true)
   useEffect(() => {
     const fetchListing = async () => {
       try {
@@ -137,7 +142,17 @@ export default function Listing() {
                 {listing.furnished ? "Furnished" : "Unfurnished"}
               </li>
             </ul>
+            {currentUser&&listing.userRef!==currentUser._id&&contactButton&&(
+              <>
+                <button onClick={()=>setcontactButton(false)}className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-90 uppercase">Contact the owner</button>
+              </>
+            )}
+            {currentUser&&listing.userRef!==currentUser._id&&!contactButton&&(
+              <Email listing={listing}/>
+            )}
           </div>
+          
+          
         </>
       )}
     </div>

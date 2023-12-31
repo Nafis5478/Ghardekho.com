@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import bcryptjs from 'bcryptjs';
 import User from '../models/user.model.js';
 import { errorHandler } from '../utils/error.js';
@@ -57,6 +58,23 @@ export const listings=async(req,res,next)=>{
   try {
     const listings=await Listing.find({userRef:req.params.id});
     res.status(200).json(listings);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const getUser=async(req,res,next)=>{
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).send("Invalid ObjectId");
+  }
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return next(errorHandler(404, "Listing not found!"));
+    }
+    const { password, ...rest } = user._doc;
+
+    res.status(200).json(rest);
   } catch (error) {
     next(error);
   }
