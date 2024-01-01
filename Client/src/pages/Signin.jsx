@@ -3,10 +3,19 @@ import Oauth from '../components/Oauth';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { signinStart,signinSuccess,siginFailure } from '../redux/user/userSlice';
+import { useEffect } from 'react';
 export default function Signin() {
+  const navigate = useNavigate();
+  const { currentUser } = useSelector((state) => state.user);
+  useEffect(() => {
+    if(currentUser){
+      navigate('/profile')
+      return;
+    }
+  }, [currentUser])
+  
   const [formData, setFormData] = useState({});
   const {loading,error}=useSelector((state)=>state.user);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleChange = (e) => {
     setFormData({
