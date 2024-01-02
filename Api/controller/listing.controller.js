@@ -108,7 +108,7 @@ export const getListings=async(req,res,next)=>{
       parking,
       type
       // similarly getting all listing based on above parameters and then we will sort them using sort and order...
-    }).sort({[sort]:order}).limit(limit).skip(startIndex);
+    }).sort({ [sort]: order }).limit(limit).skip(startIndex);
     // after sorting the listings we need to put limit on them and skip function b'coz we have to skip all lists of index 0-startIndex-1 that's why skip First startIndex listings...
 
     return res.status(200).json(listings);

@@ -59,7 +59,7 @@ export default function Search() {
       })
     }
     if(e.target.id==='sort_order'){
-      const sort=e.target.value.split('_')[0]||'created_at';
+      const sort=e.target.value.split('_')[0]||'createdAt';
       const order=e.target.value.split('_')[1]||'desc';
       setsidebardata({...sidebardata,sort,order});
     }
@@ -128,11 +128,11 @@ export default function Search() {
           </div>
           <div className="flex items-center gap-2">
             <label className="whitespace-nowrap font-semibold">Sort:</label>
-            <select onChange={handleChange} defaultValue={'created_at_desc'}id="sort_order" className="border rounded-lg p-3">
+            <select onChange={handleChange} defaultValue={'createdAt_desc'}id="sort_order" className="border rounded-lg p-3">
               <option value="regularPrice_desc">Price Low to High</option>
               <option value="regularPrice_asc">Price High to Low</option>
-              <option value="created_at_desc">Latest</option>
-              <option value="created_at_asc">Oldest</option>
+              <option value="createdAt_desc">Latest</option>
+              <option value="createdAt_asc">Oldest</option>
             </select>
           </div>
           <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
@@ -151,9 +151,9 @@ export default function Search() {
         {loading&&(
           <p className="text-slate-700 text-center font-semibold text-xl">Loading...</p>
         )}
-        {!loading&&Listing&&Listing.map((listing)=>(
-          <ListingItem key={listing._id} listing={listing}/>
-        ))}
+        {!loading&&Listing&&Listing.map((listing) => (
+              <ListingItem key={listing._id} listing={listing} />
+            ))}
         </div>
       </div>
     </div>
