@@ -1,11 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 export default function Header() {
+  const location=useLocation();
   const navigate=useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,7 +17,7 @@ export default function Header() {
     urlParams.set('searchTerm',searchTerm);
     const searchQuery=urlParams.toString();
     // console.log(`searchQuery is ${searchQuery}`)
-    navigate(`/search?${searchQuery}`);
+    navigate(`/listings?${searchQuery}`);
   }
   useEffect(() => {
     const urlParams=new URLSearchParams(location.search);
@@ -37,7 +39,7 @@ export default function Header() {
         <form onSubmit={handleSubmit} className="bg-slate-100 p-3 rounded-lg flex items-center">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search Listings..."
             className="bg-transparent focus: outline-none w-24 sm:w-64"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -46,15 +48,20 @@ export default function Header() {
           <FaSearch className="text-slate-600"></FaSearch>
           </button>
         </form>
-        <ul className="flex gap-4">
+        <ul className="flex gap-4 items-center">
           <Link to="/">
-            <li className="hidden sm:inline text-slate-700 hover:underline">
+            <li className={`p-1 hidden sm:inline text-slate-700 rounded-lg hover:underline ${location.pathname==='/'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>
               Home
             </li>
           </Link>
           <Link to="/about">
-            <li className="hidden sm:inline text-slate-700 hover:underline">
+            <li className={`p-1 hidden sm:inline text-slate-700 rounded-lg hover:underline ${location.pathname==='/about'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>
               About
+            </li>
+          </Link>
+          <Link to="/listings">
+            <li className={`p-1 hidden sm:inline text-slate-700 rounded-lg hover:underline ${location.pathname==='/listings'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>
+              Listing
             </li>
           </Link>
 
@@ -63,7 +70,7 @@ export default function Header() {
               <img
                 src={currentUser.avatar}
                 alt="profile"
-                className="rounded-full h-7 w-7 object-cover"
+                className="rounded-full h-9 w-9 object-cover"
               />
             ) : (
               <li className=" text-slate-700 hover:underline">SignIn</li>
