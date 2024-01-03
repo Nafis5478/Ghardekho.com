@@ -74,9 +74,9 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import userRoute from './routes/user.route.js';
-import authRoute from './routes/auth.route.js';
-import listingRoute from './routes/listing.route.js';
+import userRoute from './route/user.router.js';
+import authRoute from './route/auth.router.js';
+import listingRoute from './route/listing.router.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 dotenv.config();
