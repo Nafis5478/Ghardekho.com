@@ -28,7 +28,7 @@ export default function Header() {
   }, [location.search])
   
   return (
-    <header className="bg-slate-200 shadow-md">
+    <header className="bg-slate-200 shadow-md ">
       <div className="flex justify-between items-center max-w-6xl mx-auto">
         <Link to="/">
           <h1 className="font-bold text-sm sm:text-xl flex flex-wrap p-3">
@@ -39,8 +39,8 @@ export default function Header() {
         <form onSubmit={handleSubmit} className="bg-slate-100 p-3 rounded-lg flex items-center">
           <input
             type="text"
-            placeholder="Search Listings..."
-            className="bg-transparent focus: outline-none w-24 sm:w-64"
+            placeholder="Search"
+            className='bg-transparent focus:outline-none w-24 sm:w-64'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -54,14 +54,14 @@ export default function Header() {
               Home
             </li>
           </Link>
-          <Link to="/about">
-            <li className={`p-1 hidden sm:inline text-slate-700 rounded-lg hover:underline ${location.pathname==='/about'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>
-              About
-            </li>
-          </Link>
           <Link to="/listings">
             <li className={`p-1 hidden sm:inline text-slate-700 rounded-lg hover:underline ${location.pathname==='/listings'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>
               Listing
+            </li>
+          </Link>
+          <Link to="/about">
+            <li className={`p-1 hidden sm:inline text-slate-700 rounded-lg hover:underline ${location.pathname==='/about'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>
+              About
             </li>
           </Link>
 
@@ -73,7 +73,7 @@ export default function Header() {
                 className="rounded-full h-9 w-9 object-cover"
               />
             ) : (
-              <li className=" text-slate-700 hover:underline">SignIn</li>
+              <li className={`p-1 hidden sm:inline text-slate-700 rounded-lg hover:underline ${location.pathname==='/sign-in'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>SignIn</li>
             )}
           </Link>
         </ul>

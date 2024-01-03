@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useSelector } from "react-redux";
@@ -16,9 +16,11 @@ import {
   FaMapMarkerAlt,
   FaParking,
   FaShare,
+  FaEdit,
 } from "react-icons/fa";
 import Email from "./Email.jsx";
 export default function Listing() {
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   SwiperCore.use([Navigation]);
   const params = useParams();
@@ -64,16 +66,20 @@ export default function Listing() {
       )}
       {listing && !error && !loading && (
         <>
+          {currentUser._id===listing.userRef&&
+          <div
+            className="fixed top-[25%] left-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer"
+            onClick={() => {
+              navigate(`/update-listing/${listing._id}`)
+            }}
+          >
+            
+              <FaEdit className="text-slate-500" /> 
+          </div>
+          }
           <Swiper navigation>
             {listing.imageUrls.map((url) => (
               <SwiperSlide key={url}>
-                {/* <div
-                  className="h-[550px]"
-                  style={{
-                    background: `url(${url}) center no-repeat`,
-                    backgroundSize: "cover",
-                  }}
-                ></div> */}
                 <div className="aspect-w-16 aspect-h-9">
                   <div
                     className=" h-[275px] sm:h-[550px]"
@@ -86,8 +92,9 @@ export default function Listing() {
               </SwiperSlide>
             ))}
           </Swiper>
+                    
           <div
-            className="fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer"
+            className="fixed top-[25%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer"
             onClick={() => {
               navigator.clipboard.writeText(window.location.href);
               setCopied(true);
@@ -96,7 +103,8 @@ export default function Listing() {
               }, 2000);
             }}
           >
-            <FaShare className="text-slate-500" />
+              <FaShare className="text-slate-500" />
+            
           </div>
           {copied && (
             <p className="fixed top-[23%] right-[5%] z-10 rounded-md bg-slate-100 p-2">

@@ -46,7 +46,6 @@ export default function Home() {
   }, []);
   return (
     <div>
-      {/* top */}
 
       <div className="flex-1">
         <div className="flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto">
@@ -71,26 +70,24 @@ export default function Home() {
           </Link>
         </div>
       </div>
-      {/* bottom */}
       <Swiper navigation>
         {offerListings &&
           offerListings.length > 0 &&
           offerListings.map((listing) => (
             <SwiperSlide key={listing._id}>
               {" "}
-              {/* Assign a unique key */}
-              <div
-                style={{
-                  background: `url(${listing.imageUrls[0]}) center no-repeat`,
-                  backgroundSize: "cover",
-                }}
-                className="h-[500px]"
-              ></div>
+              <div className="aspect-w-16 aspect-h-9">
+                <div
+                  className=" h-[275px] sm:h-[550px]"
+                  style={{
+                    background: `url(${listing.imageUrls[0]}) center no-repeat`,
+                    backgroundSize: "cover",
+                  }}
+                ></div>
+              </div>
             </SwiperSlide>
           ))}
       </Swiper>
-
-      {/* listing results for offer, sale and rent */}
 
       <div className="max-w-6xl mx-auto p-3 flex flex-col gap-8 my-10">
         {offerListings && offerListings.length > 0 && (
@@ -107,7 +104,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="flex flex-wrap gap-4">
-              {offerListings.map((listing,idx) => (
+              {offerListings.map((listing, idx) => (
                 <ListingItem listing={listing} key={idx} />
               ))}
             </div>
@@ -127,7 +124,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="flex flex-wrap gap-4">
-              {rentListings.map((listing,idx) => (
+              {rentListings.map((listing, idx) => (
                 <ListingItem listing={listing} key={idx} />
               ))}
             </div>

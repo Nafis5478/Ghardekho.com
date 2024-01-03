@@ -111,7 +111,7 @@ export default function Search() {
     urlParams.set('sort', sidebardata.sort);
     urlParams.set('order', sidebardata.order);
     const searchQuery = urlParams.toString();
-    navigate(`/listin?${searchQuery}`);
+    navigate(`/listings?${searchQuery}`);
   };
 
   const onShowMoreClick = async () => {
