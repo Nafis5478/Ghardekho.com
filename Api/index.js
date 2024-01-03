@@ -32,7 +32,7 @@ mongoose.connect(process.env.MONGO)
     });
 
 
-const __dirname=path.resolve();
+// const __dirname=path.resolve();
 const app = express();
 
 app.listen(3000, () => {
@@ -47,10 +47,10 @@ app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/listing', listingRouter);
 
-app.use(express.static(path.join(__dirname,'/client/dist')));
-app.get('*',(req,res)=>{
-    res.sendFile(path.join(__dirname,'client','dist','index.html'));
-})
+// app.use(express.static(path.join(__dirname,'/client/dist')));
+// app.get('*',(req,res)=>{
+//     res.sendFile(path.join(__dirname,'client','dist','index.html'));
+// })
 
 app.use((err, req, res, next) => {
     console.error('Error:', err.stack); // Log the error stack trace
