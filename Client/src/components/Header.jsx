@@ -29,9 +29,9 @@ export default function Header() {
   
   return (
     <header className="bg-slate-200 shadow-md ">
-      <div className="flex justify-between items-center max-w-6xl mx-auto">
+      <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to="/">
-          <h1 className="font-bold text-sm sm:text-xl flex flex-wrap p-3">
+          <h1 className="font-bold text-sm sm:text-xl flex flex-wrap">
             <span className="text-slate-500">Ghardekho</span>
             <span className="text-slate-700">.com</span>
           </h1>
@@ -73,7 +73,7 @@ export default function Header() {
                 className="rounded-full h-9 w-9 object-cover"
               />
             ) : (
-              <li className={`p-1 hidden sm:inline text-slate-700 rounded-lg hover:underline ${location.pathname==='/sign-in'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>SignIn</li>
+              <li className={`p-1  text-slate-700 rounded-lg hover:underline ${location.pathname==='/sign-in'?'bg-teal-500 text-white active:bg-teal-600 font-bold':''}`}>SignIn</li>
             )}
           </Link>
         </ul>
