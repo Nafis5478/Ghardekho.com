@@ -82,7 +82,10 @@ import path from 'path';
 dotenv.config();
 
 mongoose
-  .connect(process.env.MONGO)
+  .connect(process.env.MONGO,{
+    connectTimeoutMS: 30000, // Set connection timeout to 30 seconds
+  socketTimeoutMS: 30000,  // Set socket timeout to 30 seconds
+})
   .then(() => {
     console.log('Connected to MongoDB!');
   })
