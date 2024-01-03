@@ -290,7 +290,7 @@ export default function CreateListng() {
               <div className="flex flex-col text-center">
                 <span>Regular Price</span>
                 {formData.type === "rent" && (
-                  <span className="text-xs">($ / months)</span>
+                  <span className="text-xs">(₹ / months)</span>
                 )}
               </div>
             </div>

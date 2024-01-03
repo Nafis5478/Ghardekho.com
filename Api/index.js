@@ -12,23 +12,24 @@ import cookieParser from 'cookie-parser';
 
 dotenv.config();
 // in case we are using mongo db compass....
-mongoose.connect(process.env.MONGO2, {
-    dbName: process.env.dbname // Specify the database name
-})
-    .then(() => {
-        console.log('Connected to the database...');
-    })
-    .catch((err) => {
-        console.error('Error connecting to the database:', err);
-    });
-// in case we are using mongo db atlas....
-// mongoose.connect(process.env.MONGO)
+
+// mongoose.connect(process.env.MONGO2, {
+//     dbName: process.env.dbname // Specify the database name
+// })
 //     .then(() => {
 //         console.log('Connected to the database...');
 //     })
 //     .catch((err) => {
 //         console.error('Error connecting to the database:', err);
 //     });
+// in case we are using mongo db atlas....
+mongoose.connect(process.env.MONGO)
+    .then(() => {
+        console.log('Connected to the database...');
+    })
+    .catch((err) => {
+        console.error('Error connecting to the database:', err);
+    });
 
 const app = express();
 
@@ -43,12 +44,21 @@ app.use(cookieParser());
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/listing', listingRouter);
-app.use((err,req,res,next)=>{
-    const statusCode=err.statusCode||500;
-    const message=err.message||'Internal server error';
+app.use((err, req, res, next) => {
+    console.error('Error:', err.stack); // Log the error stack trace
+
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal server error';
+
+    if (res.headersSent) {
+        console.error('Headers already sent, cannot send error response again.');
+        return next(err);
+    }
+
     return res.status(statusCode).json({
-        success:false,
+        success: false,
         statusCode,
         message
-    })
-})
+    });
+});
+
