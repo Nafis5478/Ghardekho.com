@@ -66,7 +66,7 @@ export default function Listing() {
       )}
       {listing && !error && !loading && (
         <>
-          {currentUser._id===listing.userRef&&
+          {currentUser&&currentUser._id===listing.userRef&&
           <div
             className="fixed top-[25%] left-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer"
             onClick={() => {
