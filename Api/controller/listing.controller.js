@@ -101,7 +101,8 @@ export const getListings=async(req,res,next)=>{
     const listings=await Listing.find({
       $or: [
         { name: { $regex: searchTerm, $options: 'i' } },
-        { description: { $regex: searchTerm, $options: 'i' } }
+        { description: { $regex: searchTerm, $options: 'i' } },
+        { address: { $regex: searchTerm, $options: 'i' } },
       ], // this will get all listings whose name or description contains searchTerm fully or partially with case insensitive...
       offer,
       furnished,
